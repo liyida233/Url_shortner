@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>短链接生成器</title>
+</head>
+<body>
+<h2>创建短链接</h2>
+
+<label>原始链接（long URL）:</label><br>
+<input id="longUrl" placeholder="https://example.com" style="width: 300px"><br><br>
+
+<label>自定义别名（可选）:</label><br>
+<input id="customAlias" placeholder="如 leob"><br><br>
+
+<button onclick="createShortUrl()">生成短链接</button>
+
+<h3 id="result"></h3>
+
+<script>
+    function createShortUrl() {
+        const longUrl = document.getElementById("longUrl").value;
+        const customAlias = document.getElementById("customAlias").value;
+        const payload = {
+            long_url: longUrl,
+            user_id: "test-user", // 可以写死，也可以做成登录
+            custom_alias: customAlias
+        };
+
+        fetch("http://localhost:9808/create-short-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.short_url) {
+                    document.getElementById("result").innerHTML = `生成成功: <a href="${data.short_url}" target="_blank">${data.short_url}</a>`;
+                } else {
+                    document.getElementById("result").innerText = "生成失败：" + (data.error || "未知错误");
+                }
+            })
+            .catch(err => {
+                document.getElementById("result").innerText = "请求失败: " + err;
+            });
+    }
+</script>
+</body>
+</html>
